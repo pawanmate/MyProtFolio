@@ -1,0 +1,8 @@
+{
+  "name": "pawan-mate-engineering-portfolio",
+  "private": true,
+  "version": "9.20.1",
+  "scripts": {
+    "build": "node scripts/build-content.js"
+  }
+}

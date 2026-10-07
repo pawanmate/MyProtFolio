@@ -1,0 +1,160 @@
+# Pawan Mate Engineering Portfolio — Secure CMS
+# Decap Turbo is used instead of the deprecated Netlify Git Gateway.
+# Replace YOUR_TURBO_SITE_ID after creating the site in Decap Turbo.
+
+backend:
+  name: turbo-github
+  turbo_site_id: YOUR_TURBO_SITE_ID
+  branch: main
+
+media_folder: "assets/uploads"
+public_folder: "/assets/uploads"
+
+site_url: "/"
+display_url: "/"
+logo_url: "/assets/infrastructure-hero-bg.jpg"
+
+editor:
+  preview: false
+
+collections:
+  - name: "site"
+    label: "Site Content"
+    files:
+      - label: "Main Website Content"
+        name: "site"
+        file: "content/site.json"
+        format: "json"
+        fields:
+          - {label: "Brand", name: "brand", widget: "string"}
+          - label: "Hero"
+            name: "hero"
+            widget: "object"
+            fields:
+              - {label: "Eyebrow", name: "eyebrow", widget: "string"}
+              - {label: "First Name / Text", name: "name_first", widget: "string"}
+              - {label: "Last Name / Accent Text", name: "name_last", widget: "string"}
+              - {label: "Introduction", name: "intro", widget: "text"}
+              - {label: "CV Button", name: "cv_label", widget: "string"}
+              - {label: "LinkedIn Button", name: "linkedin_label", widget: "string"}
+              - {label: "LinkedIn URL", name: "linkedin_url", widget: "string"}
+          - label: "About"
+            name: "about"
+            widget: "object"
+            fields:
+              - {label: "Eyebrow", name: "eyebrow", widget: "string"}
+              - {label: "Heading", name: "heading", widget: "string"}
+              - {label: "Description", name: "description", widget: "text"}
+              - {label: "Purpose Heading", name: "purpose_heading", widget: "string"}
+              - {label: "Purpose Text", name: "purpose_text", widget: "text"}
+              - {label: "Education Heading", name: "education_heading", widget: "string"}
+              - {label: "Education Text", name: "education_text", widget: "text"}
+              - {label: "Academic Performance", name: "academic_performance", widget: "string"}
+          - label: "Skills Section"
+            name: "skills_section"
+            widget: "object"
+            fields:
+              - {label: "Eyebrow", name: "eyebrow", widget: "string"}
+              - {label: "Heading", name: "heading", widget: "string"}
+              - {label: "Description", name: "description", widget: "text"}
+          - label: "Projects Section"
+            name: "projects_section"
+            widget: "object"
+            fields:
+              - {label: "Eyebrow", name: "eyebrow", widget: "string"}
+              - {label: "Heading", name: "heading", widget: "string"}
+              - {label: "Description", name: "description", widget: "text"}
+          - label: "CV Section"
+            name: "cv_section"
+            widget: "object"
+            fields:
+              - {label: "Eyebrow", name: "eyebrow", widget: "string"}
+              - {label: "Heading", name: "heading", widget: "string"}
+              - {label: "Description", name: "description", widget: "text"}
+              - {label: "Name", name: "name", widget: "string"}
+              - {label: "Role", name: "role", widget: "string"}
+              - {label: "Text", name: "text", widget: "text"}
+              - {label: "CV File", name: "file", widget: "file", media_folder: "assets/uploads", public_folder: "/assets/uploads"}
+              - {label: "Button", name: "button", widget: "string"}
+          - label: "Contact"
+            name: "contact"
+            widget: "object"
+            fields:
+              - {label: "Eyebrow", name: "eyebrow", widget: "string"}
+              - {label: "Heading", name: "heading", widget: "string"}
+              - {label: "Description", name: "description", widget: "text"}
+              - {label: "Email", name: "email", widget: "string"}
+              - {label: "LinkedIn Display", name: "linkedin", widget: "string"}
+              - {label: "LinkedIn URL", name: "linkedin_url", widget: "string"}
+          - {label: "Footer", name: "footer", widget: "string"}
+
+  - name: "skills"
+    label: "Skills & Software"
+    files:
+      - label: "Skills"
+        name: "skills"
+        file: "content/skills.json"
+        format: "json"
+        fields:
+          - label: "Skills"
+            name: "items"
+            widget: "list"
+            fields:
+              - {label: "ID", name: "id", widget: "string", hint: "Keep IDs such as revit, autocad, bim, sketchup, staad, etabs unless you also update the website logic."}
+              - {label: "Icon", name: "icon", widget: "string"}
+              - {label: "Name", name: "name", widget: "string"}
+              - {label: "Description", name: "description", widget: "text"}
+
+  - name: "hero"
+    label: "Hero Slider"
+    files:
+      - label: "Hero Slides"
+        name: "hero"
+        file: "content/hero.json"
+        format: "json"
+        fields:
+          - label: "Slides"
+            name: "items"
+            widget: "list"
+            fields:
+              - {label: "Project Number", name: "project", widget: "number", value_type: "int", min: 0}
+              - {label: "Image", name: "image", widget: "image", media_folder: "assets/uploads", public_folder: "/assets/uploads"}
+              - {label: "Alt Text", name: "alt", widget: "string"}
+              - {label: "Caption", name: "label", widget: "string"}
+
+  - name: "projects"
+    label: "Projects & Drawings"
+    files:
+      - label: "Portfolio Projects"
+        name: "projects"
+        file: "content/projects.json"
+        format: "json"
+        fields:
+          - label: "Projects"
+            name: "items"
+            widget: "list"
+            summary: "{{fields.title}}"
+            fields:
+              - {label: "Title", name: "title", widget: "string"}
+              - {label: "Tag", name: "tag", widget: "string"}
+              - label: "Categories"
+                name: "categories"
+                widget: "select"
+                multiple: true
+                options: [revit, autocad, structural, sketchup]
+              - {label: "Description", name: "description", widget: "text"}
+              - {label: "Tools", name: "tools", widget: "string"}
+              - {label: "Project Type", name: "type", widget: "string"}
+              - {label: "Software", name: "software", widget: "string"}
+              - {label: "Skills Demonstrated", name: "skills", widget: "string"}
+              - {label: "Sheet / Scale", name: "scale", widget: "string"}
+              - {label: "Main Image", name: "image", widget: "image", media_folder: "assets/uploads", public_folder: "/assets/uploads"}
+              - label: "Gallery Images"
+                name: "gallery"
+                widget: "list"
+                field: {label: "Image", name: "image", widget: "image", media_folder: "assets/uploads", public_folder: "/assets/uploads"}
+              - label: "Drawing / PDF Files"
+                name: "documents"
+                required: false
+                widget: "list"
+                field: {label: "File", name: "file", widget: "file", media_folder: "assets/uploads", public_folder: "/assets/uploads"}

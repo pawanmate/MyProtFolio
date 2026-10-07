@@ -1,0 +1,46 @@
+{
+  "items": [
+    {
+      "project": 0,
+      "image": "assets/highres/post-office-1.png",
+      "alt": "RCC Post Office drawing",
+      "label": "RCC Post Office · AutoCAD"
+    },
+    {
+      "project": 3,
+      "image": "assets/highres/3bhk-1.png",
+      "alt": "3 BHK Revit project",
+      "label": "3 BHK Residential Model · Revit"
+    },
+    {
+      "project": 5,
+      "image": "assets/highres/dormer-1.png",
+      "alt": "Dormer Revit assignment",
+      "label": "Dormer Assignment · Revit"
+    },
+    {
+      "project": 6,
+      "image": "assets/sketchup/sketchup-kitchen.png",
+      "alt": "SketchUp kitchen interior",
+      "label": "Residential 3D Visualization · SketchUp"
+    },
+    {
+      "project": 6,
+      "image": "assets/sketchup/sketchup-landscape.png",
+      "alt": "SketchUp landscape model",
+      "label": "Landscape & Exterior · SketchUp"
+    },
+    {
+      "project": 6,
+      "image": "assets/sketchup/sketchup-house-exterior.png",
+      "alt": "SketchUp house exterior model",
+      "label": "House Exterior · SketchUp"
+    },
+    {
+      "project": 6,
+      "image": "assets/sketchup/sketchup-bedroom-1.png",
+      "alt": "SketchUp bedroom interior",
+      "label": "Bedroom Interior · SketchUp"
+    }
+  ]
+}

@@ -1,0 +1,150 @@
+{
+  "items": [
+    {
+      "title": "RCC Post Office — Planning & Drafting",
+      "tag": "AUTOCAD · STRUCTURAL",
+      "categories": [
+        "autocad",
+        "structural"
+      ],
+      "description": "Ground-floor post office planning and drafting work. The supplied sheet includes the ground-floor plan, front elevation, Section A-A′, opening schedule and RCC construction notes.",
+      "tools": "AutoCAD · RCC planning · Drafting · Scale 1:100",
+      "type": "RCC Building Design",
+      "software": "AutoCAD",
+      "skills": "2D Drafting · Building Planning · RCC Detailing · Drawing Reading",
+      "scale": "Scale 1:100 · RCC framed structure",
+      "image": "assets/highres/post-office-1.png",
+      "gallery": [
+        "assets/highres/post-office-1.png"
+      ],
+      "documents": [
+        "assets/documents/RCC-Post-Office.pdf"
+      ]
+    },
+    {
+      "title": "Structural Design Sheet",
+      "tag": "STRUCTURAL DESIGN",
+      "categories": [
+        "structural",
+        "autocad"
+      ],
+      "description": "Structural layout work showing column and beam information alongside the building planning layout.",
+      "tools": "Structural drafting · Column layout · Beam/slab coordination",
+      "type": "Structural Design",
+      "software": "AutoCAD / Structural Drafting",
+      "skills": "Column layout · Beam coordination · Drawing interpretation",
+      "scale": "Structural layout sheet",
+      "image": "assets/highres/structural-1.png",
+      "gallery": [
+        "assets/highres/structural-1.png"
+      ],
+      "documents": [
+        "assets/documents/Structural-Design.pdf"
+      ]
+    },
+    {
+      "title": "Residential Government Quarters",
+      "tag": "AUTOCAD · RCC",
+      "categories": [
+        "autocad",
+        "structural"
+      ],
+      "description": "Residential RCC-framed design containing the ground-floor plan, front elevation, Section A-A′ and opening schedule.",
+      "tools": "AutoCAD · RCC framing · Drafting · Scale 1:100",
+      "type": "Residential RCC Building",
+      "software": "AutoCAD",
+      "skills": "Building Planning · RCC Framing · Drafting · Drawing Reading",
+      "scale": "Scale 1:100",
+      "image": "assets/highres/quarters-1.png",
+      "gallery": [
+        "assets/highres/quarters-1.png"
+      ],
+      "documents": [
+        "assets/documents/Government-Quarters.pdf"
+      ]
+    },
+    {
+      "title": "3 BHK Residential Model",
+      "tag": "REVIT · BIM",
+      "categories": [
+        "revit"
+      ],
+      "description": "Revit sheet containing Level 1, two sections, room information/material information and a 3D building view.",
+      "tools": "Revit · BIM · Architectural modelling · Documentation",
+      "type": "Residential BIM Model",
+      "software": "Revit",
+      "skills": "BIM Modelling · Plans · Sections · 3D Views",
+      "scale": "Revit project sheet",
+      "image": "assets/highres/3bhk-1.png",
+      "gallery": [
+        "assets/highres/3bhk-1.png"
+      ],
+      "documents": [
+        "assets/documents/3-BHK-Revit.pdf"
+      ]
+    },
+    {
+      "title": "Staircase Study",
+      "tag": "REVIT",
+      "categories": [
+        "revit"
+      ],
+      "description": "Revit staircase sheet showing Level 1 and a 3D view with multiple stair configurations including straight, winder, quarter-turn, double-winder, half-landing, curved, spiral and split stairs.",
+      "tools": "Revit · Stair modelling · Circulation design",
+      "type": "Staircase Modelling",
+      "software": "Revit",
+      "skills": "Stair Modelling · Circulation Design · 3D Documentation",
+      "scale": "Revit project sheet",
+      "image": "assets/highres/staircase-1.png",
+      "gallery": [
+        "assets/highres/staircase-1.png"
+      ],
+      "documents": [
+        "assets/documents/Staircase-Revit.pdf"
+      ]
+    },
+    {
+      "title": "Dormer Assignment",
+      "tag": "REVIT · BIM",
+      "categories": [
+        "revit"
+      ],
+      "description": "Revit Dormer Assignment sheet showing Level 1, Site, Section 2, Level 2, South elevation and a 3D dormer building model.",
+      "tools": "Revit · BIM · 3D modelling · Architectural documentation",
+      "type": "Architectural BIM Assignment",
+      "software": "Revit",
+      "skills": "BIM Modelling · 3D Modelling · Elevations · Documentation",
+      "scale": "Revit project sheet",
+      "image": "assets/highres/dormer-1.png",
+      "gallery": [
+        "assets/highres/dormer-1.png"
+      ],
+      "documents": [
+        "assets/documents/Dormer-Revit.pdf"
+      ]
+    },
+    {
+      "title": "Residential 3D Visualization",
+      "tag": "SKETCHUP · 3D",
+      "categories": [
+        "sketchup"
+      ],
+      "description": "SketchUp visualization set showing a kitchen interior, landscaped front yard, house exterior and bedroom interior views.",
+      "tools": "SketchUp · 3D modelling · Interior · Landscape · Visualization",
+      "type": "Residential 3D Visualization",
+      "software": "SketchUp",
+      "skills": "3D Modelling · Interior · Landscape · Visualization",
+      "scale": "SketchUp model views",
+      "image": "assets/sketchup/sketchup-landscape-front.png",
+      "gallery": [
+        "assets/sketchup/sketchup-landscape-front.png",
+        "assets/sketchup/sketchup-house-exterior.png",
+        "assets/sketchup/sketchup-kitchen.png",
+        "assets/sketchup/sketchup-landscape.png",
+        "assets/sketchup/sketchup-bedroom-1.png",
+        "assets/sketchup/sketchup-bedroom-2.png"
+      ],
+      "documents": []
+    }
+  ]
+}

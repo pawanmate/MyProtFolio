@@ -1,0 +1,51 @@
+{
+  "brand": "PAWAN.",
+  "hero": {
+    "eyebrow": "Civil Engineering Portfolio",
+    "name_first": "Pawan Sanjay",
+    "name_last": "Mate",
+    "intro": "Civil Engineering student focused on BIM, technical drafting, architectural modelling and structural design. I turn engineering concepts into detailed drawings, digital models and practical project documentation.",
+    "cv_label": "View CV",
+    "linkedin_label": "LinkedIn",
+    "linkedin_url": "https://www.linkedin.com/in/pawan-mate-6a989b379"
+  },
+  "about": {
+    "eyebrow": "01 — About",
+    "heading": "Engineering with a design mindset.",
+    "description": "I am developing practical skills in BIM, CAD, architectural modelling and structural drafting, with a focus on turning engineering concepts into clear digital drawings and coordinated models.",
+    "purpose_heading": "Engineering with purpose",
+    "purpose_text": "I explore the intersection of civil engineering and digital design through BIM, CAD, structural drafting and 3D modelling. My goal is to create clear, accurate and practical project documentation.",
+    "education_heading": "Education",
+    "education_text": "BE Civil Engineering|Dr. D. Y. Patil Institute of Technology|Currently pursuing · Expected 2028",
+    "academic_performance": "First Year 8.32 CGPA · Second Year 8.31 CGPA"
+  },
+  "skills_section": {
+    "eyebrow": "02 — Skills",
+    "heading": "Technical skills & tools",
+    "description": "Digital tools and engineering skills I use to develop, document and visualize built-environment projects."
+  },
+  "projects_section": {
+    "eyebrow": "03 — Portfolio",
+    "heading": "Selected engineering work",
+    "description": "A selection of academic and technical work across CAD drafting, BIM, architectural modelling and structural design. Each project highlights the tools and skills used to develop the final documentation or model."
+  },
+  "cv_section": {
+    "eyebrow": "04 — CV",
+    "heading": "My résumé",
+    "description": "A concise overview of my education, technical skills, certifications, projects and achievements.",
+    "name": "Pawan Sanjay Mate",
+    "role": "BE Civil Engineering · BIM · Structural Design · Architectural Modelling",
+    "text": "Currently developing practical experience in digital engineering workflows, technical drafting and building modelling.",
+    "file": "Pawan-Mate-CV.pdf",
+    "button": "Open CV ↗"
+  },
+  "contact": {
+    "eyebrow": "05 — Contact",
+    "heading": "Let's build something meaningful.",
+    "description": "Open to learning, collaboration and Civil Engineering opportunities.",
+    "email": "pawanmate41@gmail.com",
+    "linkedin": "linkedin.com/in/pawan-mate-6a989b379",
+    "linkedin_url": "https://www.linkedin.com/in/pawan-mate-6a989b379"
+  },
+  "footer": "Civil Engineering · BIM · Structural Design"
+}

@@ -1,0 +1,40 @@
+{
+  "items": [
+    {
+      "id": "revit",
+      "icon": "🏢",
+      "name": "Revit",
+      "description": "BIM-based building modelling, plans, sections, components, documentation and 3D views."
+    },
+    {
+      "id": "autocad",
+      "icon": "📐",
+      "name": "AutoCAD",
+      "description": "2D drafting, plans, elevations, sections, layouts and structural detailing."
+    },
+    {
+      "id": "bim",
+      "icon": "🧩",
+      "name": "BIM",
+      "description": "Model-based documentation, Revit workflows, building information and coordinated project presentation."
+    },
+    {
+      "id": "sketchup",
+      "icon": "🏠",
+      "name": "SketchUp",
+      "description": "3D architectural modelling, interior views and built-environment visualization."
+    },
+    {
+      "id": "staad",
+      "icon": "🏗️",
+      "name": "STAAD.Pro",
+      "description": "Structural-analysis learning track for future project applications."
+    },
+    {
+      "id": "etabs",
+      "icon": "📊",
+      "name": "ETABS",
+      "description": "Structural-analysis learning track for future project applications."
+    }
+  ]
+}

@@ -316,39 +316,251 @@ section:nth-of-type(even){background:rgba(13,13,20,.44)!important}
 <section id="contact"><div class="container"><div class="section-head"><div class="eyebrow" id="contactEyebrow"></div><h2 id="contactHeading"></h2><p id="contactDescription"></p></div><div class="contact"><a id="contactEmail" href="mailto:pawanmate41@gmail.com"><span>Email</span>pawanmate41@gmail.com</a><a id="contactLinkedin" href="https://www.linkedin.com/in/pawan-mate-6a989b379" target="_blank"><span>LinkedIn</span>linkedin.com/in/pawan-mate-6a989b379 ↗</a></div></div></section>
 <footer>© 2026 Pawan Sanjay Mate · Civil Engineering · BIM · Structural Design</footer>
 <script>
-(function renderCMSContent(){
-  const d=window.PORTFOLIO_DATA;
-  if(!d) return;
-  const set=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value||''};
-  const s=d.site;
-  set('heroEyebrow',s.hero.eyebrow);set('heroNameFirst',s.hero.name_first);set('heroNameLast',s.hero.name_last);set('heroIntro',s.hero.intro);
-  const heroCv=document.getElementById('heroCvButton'); heroCv.textContent=s.hero.cv_label; heroCv.href=s.cv_section.file;
-  const heroLi=document.getElementById('heroLinkedinButton'); heroLi.textContent=s.hero.linkedin_label+' ↗'; heroLi.href=s.hero.linkedin_url;
-  set('aboutEyebrow',s.about.eyebrow);set('aboutHeading',s.about.heading);set('aboutDescription',s.about.description);set('aboutPurposeHeading',s.about.purpose_heading);set('aboutPurposeText',s.about.purpose_text);set('aboutEducationHeading',s.about.education_heading);set('aboutAcademic',s.about.academic_performance);
-  const edu=document.getElementById('aboutEducationText'); if(edu){edu.innerHTML=s.about.education_text.split('|').map((x,i)=>i===0?'<b>'+x+'</b>':x).join('<br>')}
-  set('skillsEyebrow',s.skills_section.eyebrow);set('skillsHeading',s.skills_section.heading);set('skillsDescription',s.skills_section.description);
-  set('projectsEyebrow',s.projects_section.eyebrow);set('projectsHeading',s.projects_section.heading);set('projectsDescription',s.projects_section.description);
-  set('cvEyebrow',s.cv_section.eyebrow);set('cvHeading',s.cv_section.heading);set('cvDescription',s.cv_section.description);set('cvName',s.cv_section.name);set('cvRole',s.cv_section.role);set('cvText',s.cv_section.text);set('cvButton',s.cv_section.button);
-  const cv=document.getElementById('cvButton'); cv.href=s.cv_section.file;
-  set('contactEyebrow',s.contact.eyebrow);set('contactHeading',s.contact.heading);set('contactDescription',s.contact.description);set('footerText',s.footer);
-  const ce=document.getElementById('contactEmail'); ce.href='mailto:'+s.contact.email; ce.innerHTML='<span>Email</span>'+s.contact.email;
-  const cl=document.getElementById('contactLinkedin'); cl.href=s.contact.linkedin_url; cl.innerHTML='<span>LinkedIn</span>'+s.contact.linkedin+' ↗';
+window.renderCMSContent = function(customData) {
+  const d = customData || window.PORTFOLIO_DATA;
+  if (!d) return;
+  window.PORTFOLIO_DATA = d;
 
-  const sg=document.getElementById('skillsGrid');
-  sg.innerHTML=d.skills.map(x=>`<div class="skill skill-clickable" tabindex="0" role="button" data-software="${x.id}">${x.icon}<h3>${x.name} <span class="click-hint">View work ↗</span></h3><p>${x.description}</p></div>`).join('');
+  const set = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value || ''; };
+  const s = d.site || {};
+  const hero = d.hero_data || d.hero_section || s.hero || {};
+  const about = d.about_data || s.about || {};
+  const cvSec = d.cv_section || s.cv_section || {};
+  const contact = d.contact_data || s.contact || {};
+  const skillsSec = d.skills_section || s.skills_section || {};
+  const projSec = d.projects_section || s.projects_section || {};
 
-  const pg=document.getElementById('projectsGrid');
-  pg.innerHTML=d.projects.map((p,i)=>`<article class="project project-clickable" tabindex="0" role="button" data-project="${i}" data-cat="${p.categories.join(' ')}"><img loading="lazy" src="${p.image}" alt="${p.title}"><div class="project-body"><span class="tag">${p.tag}</span><h3>${p.title}</h3><p>${p.description}</p><div class="project-meta"><span><b>Type</b>${p.type}</span><span><b>Software</b>${p.software}</span></div><div class="project-skills">${p.skills}</div><div class="tools">${p.scale}</div></div></article>`).join('');
+  // Hero
+  if (hero.eyebrow) set('heroEyebrow', hero.eyebrow);
+  if (hero.name_first) set('heroNameFirst', hero.name_first);
+  if (hero.name_last) set('heroNameLast', hero.name_last);
+  if (hero.intro) set('heroIntro', hero.intro);
 
-  const slider=document.getElementById('heroSlider');
-  const dots=slider.querySelector('.slider-dots');
-  const prev=slider.querySelector('.slider-prev'); const next=slider.querySelector('.slider-next');
-  d.hero.forEach((x,i)=>{const slide=document.createElement('div');slide.className='slide'+(i===0?' active':'');slide.dataset.project=x.project;slide.innerHTML=`<img src="${x.image}" alt="${x.alt}"><span>${x.label}</span>`;slider.insertBefore(slide,prev);const dot=document.createElement('button');dot.type='button';dot.setAttribute('aria-label','Show project '+(i+1));dots.appendChild(dot)});
+  const heroCv = document.getElementById('heroCvButton');
+  if (heroCv) {
+    heroCv.textContent = hero.cv_label || 'View CV';
+    if (cvSec.file) heroCv.href = cvSec.file;
+  }
+  const heroLi = document.getElementById('heroLinkedinButton');
+  if (heroLi) {
+    heroLi.textContent = (hero.linkedin_label || 'LinkedIn') + ' ↗';
+    if (hero.linkedin_url || contact.linkedin_url) heroLi.href = hero.linkedin_url || contact.linkedin_url;
+  }
+
+  // About
+  if (about.eyebrow) set('aboutEyebrow', about.eyebrow);
+  if (about.heading) set('aboutHeading', about.heading);
+  if (about.description) set('aboutDescription', about.description);
+  if (about.purpose_heading) set('aboutPurposeHeading', about.purpose_heading);
+  if (about.purpose_text) set('aboutPurposeText', about.purpose_text);
+  if (about.education_heading) set('aboutEducationHeading', about.education_heading);
+  if (about.academic_performance) set('aboutAcademic', about.academic_performance);
+
+  const edu = document.getElementById('aboutEducationText');
+  if (edu && about.education_text) {
+    edu.innerHTML = about.education_text.split('|').map((x, i) => i === 0 ? '<b>' + x + '</b>' : x).join('<br>');
+  }
+
+  // Section Headers
+  set('skillsEyebrow', skillsSec.eyebrow || '02 — Skills');
+  set('skillsHeading', skillsSec.heading || 'Technical skills & tools');
+  set('skillsDescription', skillsSec.description || 'Digital tools and engineering skills I use to develop, document and visualize built-environment projects.');
+
+  set('projectsEyebrow', projSec.eyebrow || '03 — Portfolio');
+  set('projectsHeading', projSec.heading || 'Selected engineering work');
+  set('projectsDescription', projSec.description || 'A selection of academic and technical work across CAD drafting, BIM, architectural modelling and structural design.');
+
+  // CV Section
+  set('cvEyebrow', cvSec.eyebrow || '04 — CV');
+  set('cvHeading', cvSec.heading || 'My résumé');
+  set('cvDescription', cvSec.description || 'A concise overview of my education, technical skills, certifications, projects and achievements.');
+  set('cvName', cvSec.name || 'Pawan Sanjay Mate');
+  set('cvRole', cvSec.role || 'BE Civil Engineering · BIM · Structural Design');
+  set('cvText', cvSec.text || 'Currently developing practical experience in digital engineering workflows.');
+  set('cvButton', cvSec.button || 'Open CV ↗');
+  const cvBtn = document.getElementById('cvButton');
+  if (cvBtn && cvSec.file) cvBtn.href = cvSec.file;
+
+  // Contact & Footer
+  set('contactEyebrow', contact.eyebrow || '05 — Contact');
+  set('contactHeading', contact.heading || "Let's build something meaningful.");
+  set('contactDescription', contact.description || 'Open to learning, collaboration and Civil Engineering opportunities.');
+  set('footerText', s.footer || '© 2026 Pawan Sanjay Mate · Civil Engineering · BIM · Structural Design');
+
+  const ce = document.getElementById('contactEmail');
+  if (ce && contact.email) {
+    ce.href = 'mailto:' + contact.email;
+    ce.innerHTML = '<span>Email</span>' + contact.email;
+  }
+  const cl = document.getElementById('contactLinkedin');
+  if (cl && (contact.linkedin || contact.linkedin_url)) {
+    cl.href = contact.linkedin_url || '#';
+    cl.innerHTML = '<span>LinkedIn</span>' + (contact.linkedin || 'LinkedIn') + ' ↗';
+  }
+
+  // Skills Grid
+  const skillsList = d.skills || [];
+  const sg = document.getElementById('skillsGrid');
+  if (sg && skillsList.length) {
+    sg.innerHTML = skillsList.filter(x => x.visible !== false).map(x => `
+      <div class="skill skill-clickable" tabindex="0" role="button" data-software="${x.id}">
+        ${x.icon || '📐'}
+        <h3>${x.name} <span class="click-hint">View work ↗</span></h3>
+        <p>${x.description}</p>
+      </div>
+    `).join('');
+    // Re-bind skill click listeners
+    document.querySelectorAll('.skill-clickable').forEach(card => {
+      card.addEventListener('click', () => typeof openSoftwareWork === 'function' && openSoftwareWork(card.dataset.software));
+      card.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); typeof openSoftwareWork === 'function' && openSoftwareWork(card.dataset.software); }
+      });
+    });
+  }
+
+  // Projects Grid
+  const projectsList = d.projects || [];
+  window.currentProjects = projectsList;
+  const pg = document.getElementById('projectsGrid');
+  if (pg && projectsList.length) {
+    pg.innerHTML = projectsList.filter(p => p.visible !== false).map((p, i) => `
+      <article class="project project-clickable" tabindex="0" role="button" data-project="${i}" data-cat="${(p.categories || []).join(' ')}">
+        <img loading="lazy" src="${p.image}" alt="${p.title}">
+        <div class="project-body">
+          <span class="tag">${p.tag || 'CIVIL'}</span>
+          <h3>${p.title}</h3>
+          <p>${p.description || ''}</p>
+          <div class="project-meta">
+            <span><b>Type</b>${p.type || 'Civil Design'}</span>
+            <span><b>Software</b>${p.software || 'AutoCAD'}</span>
+          </div>
+          <div class="project-skills">${p.skills || ''}</div>
+          <div class="tools">${p.scale || ''}</div>
+        </div>
+      </article>
+    `).join('');
+
+    // Re-bind project clicks
+    document.querySelectorAll('.project-clickable').forEach(card => {
+      card.addEventListener('click', () => typeof openProject === 'function' && openProject(Number(card.dataset.project)));
+      card.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); typeof openProject === 'function' && openProject(Number(card.dataset.project)); }
+      });
+    });
+  }
+
+  // Hero Slider
+  const slidesList = (d.hero && d.hero.slider) || d.hero_slides || (Array.isArray(d.hero) ? d.hero : []);
+  const slider = document.getElementById('heroSlider');
+  if (slider && slidesList.length) {
+    const dots = slider.querySelector('.slider-dots');
+    const prev = slider.querySelector('.slider-prev');
+    slider.querySelectorAll('.slide').forEach(s => s.remove());
+    if (dots) dots.innerHTML = '';
+
+    slidesList.forEach((x, i) => {
+      const slide = document.createElement('div');
+      slide.className = 'slide' + (i === 0 ? ' active' : '');
+      slide.dataset.project = x.project_index !== undefined ? x.project_index : (x.project !== undefined ? x.project : 0);
+      slide.innerHTML = `<img src="${x.image}" alt="${x.alt || ''}"><span>${x.label || ''}</span>`;
+      slider.insertBefore(slide, prev);
+      if (dots) {
+        const dot = document.createElement('button');
+        dot.type = 'button';
+        dot.setAttribute('aria-label', 'Show project ' + (i + 1));
+        dots.appendChild(dot);
+      }
+    });
+  }
+
+  // Appearance & Theme Colors
+  if (d.appearance) {
+    if (d.appearance.accent_color) {
+      document.documentElement.style.setProperty('--accent', d.appearance.accent_color);
+    }
+    if (d.appearance.bg_color) {
+      document.documentElement.style.setProperty('--bg', d.appearance.bg_color);
+    }
+  }
+
+  // Section Visibility
+  if (d.sections && Array.isArray(d.sections)) {
+    d.sections.forEach(sec => {
+      const secEl = document.getElementById(sec.id);
+      if (secEl) {
+        secEl.style.display = sec.visible === false ? 'none' : '';
+      }
+    });
+  }
+};
+
+// Initial Render from inlined data
+window.renderCMSContent();
+
+// Dynamic Database Fetcher & Draft Preview Handler
+(async function initLiveCMSLoader() {
+  const isPreview = window.location.search.includes('preview=true');
+
+  if (isPreview) {
+    // Show Floating Draft Preview Banner
+    const banner = document.createElement('div');
+    banner.id = 'draftPreviewBanner';
+    banner.innerHTML = `
+      <div style="position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(90deg,#ff9a4a,#43c7ee);color:#061017;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;font-weight:700;font-size:13px;box-shadow:0 4px 20px rgba(0,0,0,0.6);font-family:Inter,sans-serif;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="background:#061017;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;letter-spacing:1px;text-transform:uppercase;">DRAFT PREVIEW</span>
+          <span>Viewing unpublished draft content. Live visitors cannot see this.</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <a href="/admin" style="background:rgba(6,16,23,0.18);color:#061017;padding:6px 14px;border-radius:6px;text-decoration:none;font-weight:700;">Admin Dashboard</a>
+          <a href="/" style="color:#061017;text-decoration:underline;font-size:12px;">Exit Preview</a>
+        </div>
+      </div>
+    `;
+    document.body.prepend(banner);
+    document.body.style.paddingTop = '42px';
+
+    // Fetch Draft Data
+    try {
+      const token = localStorage.getItem('pm_portfolio_supabase_token');
+      const res = await fetch('/api/admin/content', {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.draft) {
+          window.renderCMSContent(json.draft);
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn('Could not fetch draft, falling back to published content.');
+    }
+  }
+
+  // Normal Visit: Fetch Live Published Content
+  try {
+    const res = await fetch('/api/content');
+    if (res.ok) {
+      const json = await res.json();
+      if (json.success && json.content) {
+        window.renderCMSContent(json.content);
+      }
+    }
+  } catch (err) {
+    console.log('Using pre-rendered fallback portfolio data.');
+  }
 })();
 </script>
 <script>
-const buttons=[...document.querySelectorAll('.filter')],cards=[...document.querySelectorAll('.project')];
-buttons.forEach(btn=>btn.onclick=()=>{buttons.forEach(b=>b.classList.remove('active'));btn.classList.add('active');let f=btn.dataset.filter;cards.forEach(c=>c.style.display=f==='all'||c.dataset.cat.includes(f)?'block':'none')});
+const buttons = [...document.querySelectorAll('.filter')];
+buttons.forEach(btn => btn.onclick = () => {
+  buttons.forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const f = btn.dataset.filter;
+  const cards = [...document.querySelectorAll('.project')];
+  cards.forEach(c => c.style.display = f === 'all' || (c.dataset.cat && c.dataset.cat.includes(f)) ? 'block' : 'none');
+});
 </script>
 <div class="modal" id="softwareModal" aria-hidden="true"><div class="modal-box software-modal-box"><button class="modal-close" id="softwareModalClose" aria-label="Close">×</button><div class="modal-content"><div class="eyebrow">Software portfolio</div><h2 id="softwareModalTitle"></h2><p id="softwareModalDesc"></p><button class="btn" id="softwareModalClose2">Close</button></div></div></div>
 <div class="modal" id="projectModal" aria-hidden="true">
@@ -378,7 +590,7 @@ buttons.forEach(btn=>btn.onclick=()=>{buttons.forEach(b=>b.classList.remove('act
 </div>
 
 <script>
-const projectDetails = window.PORTFOLIO_DATA.projects;
+let projectDetails = window.PORTFOLIO_DATA.projects;
 const projectModal = document.getElementById('projectModal');
 const modalImage = document.getElementById('modalImage');
 const modalTag = document.getElementById('modalTag');
@@ -389,13 +601,15 @@ const modalGallery = document.getElementById('modalGallery');
 const modalClose = document.getElementById('modalClose');
 
 function openProject(i){
-  const p = projectDetails[i];
+  const projs = (window.PORTFOLIO_DATA && window.PORTFOLIO_DATA.projects) || projectDetails;
+  const p = projs[i];
+  if (!p) return;
   modalImage.src = p.image;
   modalImage.alt = p.title;
-  modalTag.textContent = p.tag;
+  modalTag.textContent = p.tag || 'CIVIL';
   modalTitle.textContent = p.title;
-  modalDesc.textContent = p.desc;
-  modalTools.textContent = p.tools;
+  modalDesc.textContent = p.description || p.desc || '';
+  modalTools.textContent = p.tools || '';
   const modalDocuments = document.getElementById('modalDocuments');
   modalDocuments.innerHTML = '';
   (p.documents || []).forEach((doc, di) => {

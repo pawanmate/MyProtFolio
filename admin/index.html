@@ -1,13 +1,854 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="robots" content="noindex,nofollow,noarchive" />
-  <title>Pawan Mate — Secure Portfolio Editor</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — Pawan Mate Portfolio CMS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-client.js"></script>
 </head>
 <body>
-  <!-- Decap Turbo handles CMS authentication; no GitHub token or password is stored here. -->
-  <script src="https://cdn.jsdelivr.net/npm/decap-cms@3.17.0-beta.0/dist/decap-cms.js"></script>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="#overview" class="sidebar-brand">
+          PAWAN<span>.</span>
+          <small>CMS Dashboard</small>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-category">Main</div>
+        <a class="nav-item active" data-view="overview"><span class="icon">📊</span> Dashboard Overview</a>
+        
+        <div class="nav-category">Content Sections</div>
+        <a class="nav-item" data-view="hero"><span class="icon">🚀</span> Hero Section</a>
+        <a class="nav-item" data-view="about"><span class="icon">👤</span> About Me</a>
+        <a class="nav-item" data-view="skills"><span class="icon">📐</span> Skills & Software</a>
+        <a class="nav-item" data-view="projects"><span class="icon">📁</span> Projects (CRUD)</a>
+        <a class="nav-item" data-view="education"><span class="icon">🎓</span> Education</a>
+        <a class="nav-item" data-view="experience"><span class="icon">💼</span> Experience & Internships</a>
+        <a class="nav-item" data-view="certifications"><span class="icon">📜</span> Certifications</a>
+        <a class="nav-item" data-view="achievements"><span class="icon">🏆</span> Achievements & Awards</a>
+        <a class="nav-item" data-view="activities"><span class="icon">🤝</span> Activities & Leadership</a>
+        <a class="nav-item" data-view="cv"><span class="icon">📄</span> Resume / CV</a>
+        <a class="nav-item" data-view="contact"><span class="icon">✉️</span> Contact Details</a>
+        <a class="nav-item" data-view="social"><span class="icon">🌐</span> Social Media Links</a>
+        
+        <div class="nav-category">Site Configuration</div>
+        <a class="nav-item" data-view="appearance"><span class="icon">🎨</span> Website Appearance</a>
+        <a class="nav-item" data-view="sections"><span class="icon">📑</span> Section Manager</a>
+        <a class="nav-item" data-view="seo"><span class="icon">🔍</span> SEO Settings</a>
+        <a class="nav-item" data-view="publish"><span class="icon">⚡</span> Preview & Publish</a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <span id="adminUserEmail" style="font-size: 11px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; max-width: 170px;">Admin</span>
+        <button id="logoutBtn" class="btn btn-sm btn-danger" title="Sign Out">Logout</button>
+      </div>
+    </aside>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+      <!-- Top Sticky Header -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle Navigation">☰</button>
+          <div class="breadcrumb">Admin / <b id="currentViewTitle">Dashboard Overview</b></div>
+        </div>
+
+        <div class="topbar-right">
+          <div id="statusBadge" class="status-pill synced">
+            <span class="status-dot"></span>
+            <span id="statusText">Draft: Synchronized</span>
+          </div>
+
+          <button id="previewBtn" class="btn btn-sm" title="Preview Draft on public site in new tab">
+            👁 Preview Draft
+          </button>
+          <button id="saveDraftBtn" class="btn btn-sm btn-cyan" title="Save changes as private draft">
+            💾 Save Draft
+          </button>
+          <button id="publishTopBtn" class="btn btn-sm btn-primary" title="Publish draft to live website">
+            🚀 Publish Live
+          </button>
+        </div>
+      </header>
+
+      <!-- Main Content Area -->
+      <main class="content-area">
+        
+        <!-- ========================================== -->
+        <!-- VIEW 1: DASHBOARD OVERVIEW -->
+        <!-- ========================================== -->
+        <section class="view-section active" id="view-overview">
+          <div class="view-header">
+            <div>
+              <h1>Dashboard Overview</h1>
+              <p>Welcome to your portfolio CMS. Manage, update, and publish your civil engineering portfolio content.</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <a href="/" target="_blank" class="btn">View Live Site ↗</a>
+              <button class="btn btn-primary" onclick="switchView('publish')">Publish Changes</button>
+            </div>
+          </div>
+
+          <div class="overview-stats">
+            <div class="stat-card">
+              <div class="stat-card-label">Live Projects</div>
+              <div class="stat-card-num" id="statProjectsCount">0</div>
+            </div>
+            <div class="stat-card cyan">
+              <div class="stat-card-label">Skills & Software</div>
+              <div class="stat-card-num" id="statSkillsCount">0</div>
+            </div>
+            <div class="stat-card green">
+              <div class="stat-card-label">Publish Status</div>
+              <div class="stat-card-num" style="font-size: 20px; margin-top: 10px;" id="statLiveStatus">Active</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-label">Last Published</div>
+              <div class="stat-card-num" style="font-size: 14px; margin-top: 14px;" id="statLastPublished">Recently</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2 class="card-title">Quick Content Shortcuts</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 14px;">
+              <button class="btn" onclick="switchView('projects')" style="padding: 16px; justify-content: flex-start;">
+                📁 <b>Manage Projects</b>
+              </button>
+              <button class="btn" onclick="switchView('hero')" style="padding: 16px; justify-content: flex-start;">
+                🚀 <b>Edit Hero Section</b>
+              </button>
+              <button class="btn" onclick="switchView('cv')" style="padding: 16px; justify-content: flex-start;">
+                📄 <b>Update Resume / CV PDF</b>
+              </button>
+              <button class="btn" onclick="switchView('contact')" style="padding: 16px; justify-content: flex-start;">
+                ✉️ <b>Edit Contact Details</b>
+              </button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2 class="card-title">Publishing Workflow Summary</h2>
+            <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6;">
+              • <b>Draft Mode:</b> Any edits made across the sections are saved as a <b>Draft</b> in your database and are completely invisible to public visitors.<br>
+              • <b>Preview Mode:</b> Click <b>"Preview Draft"</b> to view your portfolio with all draft modifications rendered live.<br>
+              • <b>Publishing:</b> Click <b>"Publish Live"</b> to instantly make your draft changes public across the entire website without triggering any Vercel rebuilds or downtime.
+            </p>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 2: HERO SECTION -->
+        <!-- ========================================== -->
+        <section class="view-section" id="view-hero">
+          <div class="view-header">
+            <div>
+              <h1>Hero Section</h1>
+              <p>Configure the primary introduction, headings, call-to-action buttons, and featured slider cards.</p>
+            </div>
+            <button class="btn btn-cyan" onclick="saveSectionChanges('hero')">Save Hero Draft</button>
+          </div>
+
+          <div class="card">
+            <h2 class="card-title">Hero Headings & Bio</h2>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Eyebrow Tag</label>
+                <input type="text" id="heroEyebrowInput" class="form-control">
+              </div>
+              <div class="form-group">
+                <label class="form-label">First Name / Prefix</label>
+                <input type="text" id="heroFirstInput" class="form-control">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Last Name / Accent</label>
+                <input type="text" id="heroLastInput" class="form-control">
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">Introduction Paragraph</label>
+                <textarea id="heroIntroInput" class="form-control" rows="3"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2 class="card-title">Hero Statistics Badges</h2>
+            <div class="form-grid" id="heroStatsContainer">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">
+              Featured Blueprint Slider Slides
+              <button class="btn btn-sm btn-cyan" onclick="addHeroSlide()">+ Add Slide</button>
+            </div>
+            <div id="heroSlidesList" style="display: flex; flex-direction: column; gap: 12px;">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 3: ABOUT ME -->
+        <!-- ========================================== -->
+        <section class="view-section" id="view-about">
+          <div class="view-header">
+            <div>
+              <h1>About Me</h1>
+              <p>Manage your biography, career objectives, purpose statement, and academic details.</p>
+            </div>
+            <button class="btn btn-cyan" onclick="saveSectionChanges('about')">Save About Draft</button>
+          </div>
+
+          <div class="card">
+            <h2 class="card-title">Section Headings</h2>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Eyebrow</label>
+                <input type="text" id="aboutEyebrowInput" class="form-control">
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">Main Heading</label>
+                <input type="text" id="aboutHeadingInput" class="form-control">
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">Short Description</label>
+                <textarea id="aboutDescInput" class="form-control" rows="2"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2 class="card-title">Panels: Purpose & Education</h2>
+            <div class="form-grid">
+              <div class="form-group full-width">
+                <label class="form-label">Purpose Panel Heading</label>
+                <input type="text" id="aboutPurposeHeadingInput" class="form-control">
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">Purpose Statement / Text</label>
+                <textarea id="aboutPurposeTextInput" class="form-control" rows="3"></textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Education Panel Heading</label>
+                <input type="text" id="aboutEduHeadingInput" class="form-control">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Academic Performance / CGPA</label>
+                <input type="text" id="aboutAcademicInput" class="form-control">
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">Education Details <span>(Use | to separate lines)</span></label>
+                <input type="text" id="aboutEduTextInput" class="form-control">
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 4: SKILLS & SOFTWARE -->
+        <!-- ========================================== -->
+        <section class="view-section" id="view-skills">
+          <div class="view-header">
+            <div>
+              <h1>Skills & Software</h1>
+              <p>Manage CAD, BIM, visualization, and structural analysis tools displayed on the public site.</p>
+            </div>
+            <button class="btn btn-cyan" onclick="openSkillModal()">+ Add New Skill</button>
+          </div>
+
+          <div class="card">
+            <table class="item-table">
+              <thead>
+                <tr>
+                  <th style="width: 50px;">Icon</th>
+                  <th>Skill / Software Name</th>
+                  <th>Identifier (ID)</th>
+                  <th>Category</th>
+                  <th>Description</th>
+                  <th style="text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="skillsTableBody">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 5: PROJECTS (CRUD) -->
+        <!-- ========================================== -->
+        <section class="view-section" id="view-projects">
+          <div class="view-header">
+            <div>
+              <h1>Engineering Projects</h1>
+              <p>Full Create, Read, Update, Delete (CRUD) management for all civil engineering and design projects.</p>
+            </div>
+            <button class="btn btn-primary" onclick="openProjectModal()">+ Add New Project</button>
+          </div>
+
+          <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <span id="projectsCountLabel" style="font-size: 13px; color: var(--text-muted);">Showing 7 projects</span>
+              <button class="btn btn-sm" onclick="saveSectionChanges('projects')">Save Projects Order</button>
+            </div>
+
+            <table class="item-table">
+              <thead>
+                <tr>
+                  <th style="width: 60px;">Image</th>
+                  <th>Project Title</th>
+                  <th>Category Tag</th>
+                  <th>Software Used</th>
+                  <th>Documents / PDFs</th>
+                  <th>Featured</th>
+                  <th style="text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="projectsTableBody">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 6: EDUCATION -->
+        <!-- ========================================== -->
+        <section class="view-section" id="view-education">
+          <div class="view-header">
+            <div>
+              <h1>Education</h1>
+              <p>Manage your degree, diplomas, board results, and academic achievements.</p>
+            </div>
+            <button class="btn btn-cyan" onclick="openEducationModal()">+ Add Education Entry</button>
+          </div>
+
+          <div class="card">
+            <table class="item-table">
+              <thead>
+                <tr>
+                  <th>Degree / Qualification</th>
+                  <th>Institution / Board</th>
+                  <th>Year / Duration</th>
+                  <th>Score / CGPA</th>
+                  <th>Details</th>
+                  <th style="text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="educationTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 7: EXPERIENCE & INTERNSHIPS -->
+        <!-- ========================================== -->
+        <section class="view-section" id="view-experience">
+          <div class="view-header">
+            <div>
+              <h1>Experience & Internships</h1>
+              <p>Manage work experience, leadership positions, and internships.</p>
+            </div>
+            <button class="btn btn-cyan" onclick="openExperienceModal()">+ Add Experience</button>
+          </div>
+
+          <div class="card">
+            <table class="item-table">
+              <thead>
+                <tr>
+                  <th>Role / Position</th>
+                  <th>Organization / Company</th>
+                  <th>Duration</th>
+                  <th>Description / Responsibilities</th>
+                  <th style="text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="experienceTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 8: CERTIFICATIONS -->
+        <!-- ========================================== -->
+        <section class="view-section" id="view-certifications">
+          <div class="view-header">
+            <div>
+              <h1>Certifications & Training</h1>
+              <p>Manage software, drafting, and Autodesk certifications.</p>
+            </div>
+            <button class="btn btn-cyan" onclick="openCertificationModal()">+ Add Certification</button>
+          </div>
+
+          <div class="card">
+            <table class="item-table">
+              <thead>
+                <tr>
+                  <th>Certification Title</th>
+                  <th>Issuing Organization</th>
+                  <th>Year</th>
+                  <th>Description</th>
+                  <th style="text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="certificationsTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 9: ACHIEVEMENTS & AWARDS -->
+        <!-- ========================================== -->
+        <section class="view-section" id="view-achievements">
+          <div class="view-header">
+            <div>
+              <h1>Achievements & Awards</h1>
+              <p>Manage academic honors, model-making competitions, and awards.</p>
+            </div>
+            <button class="btn btn-cyan" onclick="openAchievementModal()">+ Add Achievement</button>
+          </div>
+
+          <div class="card">
+            <table class="item-table">
+              <thead>
+                <tr>
+                  <th>Award / Honor</th>
+                  <th>Organization</th>
+                  <th>Year</th>
+                  <th>Details</th>
+                  <th style="text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="achievementsTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 10: ACTIVITIES & LEADERSHIP -->
+        <!-- ========================================== -->
+        <section class="view-section" id="view-activities">
+          <div class="view-header">
+            <div>
+              <h1>Activities & Leadership</h1>
+              <p>Manage club memberships, survey initiatives, and extracurricular roles.</p>
+            </div>
+            <button class="btn btn-cyan" onclick="openActivityModal()">+ Add Activity</button>
+          </div>
+
+          <div class="card">
+            <table class="item-table">
+              <thead>
+                <tr>
+                  <th>Activity / Initiative</th>
+                  <th>Organization</th>
+                  <th>Role</th>
+                  <th>Description</th>
+                  <th style="text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="activitiesTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 11: RESUME / CV -->
+        <!-- ========================================== -->
+        <section class="view-section" id="view-cv">
+          <div class="view-header">
+            <div>
+              <h1>Resume / CV Management</h1>
+              <p>Upload and replace your PDF resume and update the resume section presentation.</p>
+            </div>
+            <button class="btn btn-cyan" onclick="saveSectionChanges('cv')">Save CV Draft</button>
+          </div>
+
+          <div class="card">
+            <h2 class="card-title">CV File & Upload</h2>
+            <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+              <div>
+                <label class="form-label">Current PDF Document</label>
+                <div style="margin-top: 6px;">
+                  <a id="currentCvLink" href="/Pawan-Mate-CV.pdf" target="_blank" class="btn">
+                    📄 View Current PDF ↗
+                  </a>
+                </div>
+              </div>
+
+              <div style="flex: 1; min-width: 260px;">
+                <label class="form-label">Upload Replacement PDF</label>
+                <div class="uploader-box" onclick="document.getElementById('cvFileInput').click()">
+                  <input type="file" id="cvFileInput" accept=".pdf" style="display: none;" onchange="handleCvUpload(this)">
+                  <span id="cvUploadText">📤 Click to select a new CV PDF (Max 15MB)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2 class="card-title">CV Section Text</h2>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Section Eyebrow</label>
+                <input type="text" id="cvEyebrowInput" class="form-control">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Heading</label>
+                <input type="text" id="cvHeadingInput" class="form-control">
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">Role Subtitle</label>
+                <input type="text" id="cvRoleInput" class="form-control">
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">Description Text</label>
+                <textarea id="cvTextInput" class="form-control" rows="2"></textarea>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 12: CONTACT DETAILS -->
+        <!-- ========================================== -->
+        <section class="view-section" id="view-contact">
+          <div class="view-header">
+            <div>
+              <h1>Contact Details</h1>
+              <p>Manage your direct contact info displayed on the public site and footer.</p>
+            </div>
+            <button class="btn btn-cyan" onclick="saveSectionChanges('contact')">Save Contact Draft</button>
+          </div>
+
+          <div class="card">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" id="contactEmailInput" class="form-control">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Phone Number</label>
+                <input type="text" id="contactPhoneInput" class="form-control">
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">Location / Address</label>
+                <input type="text" id="contactLocationInput" class="form-control">
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">Contact Heading</label>
+                <input type="text" id="contactHeadingInput" class="form-control">
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">Footer Copyright / Attribution</label>
+                <input type="text" id="footerTextInput" class="form-control">
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 13: SOCIAL MEDIA LINKS -->
+        <!-- ========================================== -->
+        <section class="view-section" id="view-social">
+          <div class="view-header">
+            <div>
+              <h1>Social Media & External Links</h1>
+              <p>Manage profiles, links, and portfolio destinations.</p>
+            </div>
+            <button class="btn btn-cyan" onclick="saveSectionChanges('social')">Save Links Draft</button>
+          </div>
+
+          <div class="card">
+            <div class="form-grid">
+              <div class="form-group full-width">
+                <label class="form-label">LinkedIn Profile URL</label>
+                <input type="url" id="socialLinkedinInput" class="form-control">
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">Live Portfolio URL</label>
+                <input type="url" id="socialPortfolioInput" class="form-control">
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">GitHub URL (Optional)</label>
+                <input type="url" id="socialGithubInput" class="form-control" placeholder="https://github.com/...">
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">Instagram / Other URL (Optional)</label>
+                <input type="url" id="socialInstagramInput" class="form-control" placeholder="https://instagram.com/...">
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 14: WEBSITE APPEARANCE -->
+        <!-- ========================================== -->
+        <section class="view-section" id="view-appearance">
+          <div class="view-header">
+            <div>
+              <h1>Website Appearance</h1>
+              <p>Tune theme colors, background aesthetics, and visual effects.</p>
+            </div>
+            <button class="btn btn-cyan" onclick="saveSectionChanges('appearance')">Save Appearance Draft</button>
+          </div>
+
+          <div class="card">
+            <h2 class="card-title">Color Palette</h2>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Primary Accent Color</label>
+                <div class="input-group">
+                  <input type="color" id="appAccentColor" style="height: 42px; width: 50px; background: none; border: 1px solid var(--line); border-radius: var(--radius-sm); cursor: pointer;">
+                  <input type="text" id="appAccentColorText" class="form-control">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Background Color</label>
+                <div class="input-group">
+                  <input type="color" id="appBgColor" style="height: 42px; width: 50px; background: none; border: 1px solid var(--line); border-radius: var(--radius-sm); cursor: pointer;">
+                  <input type="text" id="appBgColorText" class="form-control">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2 class="card-title">Motion & Atmosphere Layers</h2>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label" style="display: flex; gap: 8px; cursor: pointer;">
+                  <input type="checkbox" id="appBlueprintToggle" style="width: 18px; height: 18px;">
+                  Enable Blueprint Grid Overlay
+                </label>
+              </div>
+              <div class="form-group">
+                <label class="form-label" style="display: flex; gap: 8px; cursor: pointer;">
+                  <input type="checkbox" id="appCursorGlowToggle" style="width: 18px; height: 18px;">
+                  Enable Interactive Cursor Glow
+                </label>
+              </div>
+              <div class="form-group">
+                <label class="form-label" style="display: flex; gap: 8px; cursor: pointer;">
+                  <input type="checkbox" id="appMotionToggle" style="width: 18px; height: 18px;">
+                  Enable Parallax & Cinematic Motion
+                </label>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 15: SECTION MANAGER -->
+        <!-- ========================================== -->
+        <section class="view-section" id="view-sections">
+          <div class="view-header">
+            <div>
+              <h1>Dynamic Section Manager</h1>
+              <p>Reorder sections and toggle their visibility on the public website.</p>
+            </div>
+            <button class="btn btn-cyan" onclick="saveSectionChanges('sections')">Save Section Configuration</button>
+          </div>
+
+          <div class="card">
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+              Toggle visibility to show or hide sections instantly on the published portfolio.
+            </p>
+            <div id="sectionManagerList" style="display: flex; flex-direction: column; gap: 10px;">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 16: SEO SETTINGS -->
+        <!-- ========================================== -->
+        <section class="view-section" id="view-seo">
+          <div class="view-header">
+            <div>
+              <h1>SEO & Meta Settings</h1>
+              <p>Configure search engine titles, metadata, and social sharing tags.</p>
+            </div>
+            <button class="btn btn-cyan" onclick="saveSectionChanges('seo')">Save SEO Draft</button>
+          </div>
+
+          <div class="card">
+            <div class="form-grid">
+              <div class="form-group full-width">
+                <label class="form-label">Page Title</label>
+                <input type="text" id="seoTitleInput" class="form-control">
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">Meta Description</label>
+                <textarea id="seoDescInput" class="form-control" rows="2"></textarea>
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">Keywords <span>(Comma-separated)</span></label>
+                <input type="text" id="seoKeywordsInput" class="form-control">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Author Name</label>
+                <input type="text" id="seoAuthorInput" class="form-control">
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 17: PREVIEW & PUBLISH -->
+        <!-- ========================================== -->
+        <section class="view-section" id="view-publish">
+          <div class="view-header">
+            <div>
+              <h1>Preview & Publish Live</h1>
+              <p>Test draft modifications and push published changes to live visitors.</p>
+            </div>
+          </div>
+
+          <div class="card" style="border-left: 4px solid var(--accent);">
+            <h2 class="card-title">Publishing Center</h2>
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px;">
+              Publishing will update your live website immediately. Visitors will see the new content on their next visit or page reload without any build delay.
+            </p>
+
+            <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+              <button class="btn btn-primary" id="publishMainBtn" style="padding: 12px 24px; font-size: 15px;">
+                🚀 Publish Changes to Live Website
+              </button>
+              <button class="btn btn-cyan" onclick="openPreviewTab()" style="padding: 12px 20px;">
+                👁 Open Draft Preview in New Tab
+              </button>
+              <button class="btn btn-danger" id="discardChangesBtn" style="padding: 12px 20px;">
+                Discard Draft & Restore Published
+              </button>
+            </div>
+
+            <div style="margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 13px; color: var(--text-muted);">
+              <div><b>Current Live Status:</b> <span id="publishStatusDetail" style="color: var(--success);">Published</span></div>
+              <div style="margin-top: 4px;"><b>Last Published Timestamp:</b> <span id="publishTimeDetail">Checking...</span></div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: PROJECT EDITOR (CRUD) -->
+  <!-- ========================================== -->
+  <div class="modal-overlay" id="projectModal">
+    <div class="modal-panel">
+      <div class="modal-header">
+        <h3 id="projectModalTitle">Add New Project</h3>
+        <button class="modal-close-btn" onclick="closeModal('projectModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editProjectIndex" value="-1">
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label class="form-label">Project Title</label>
+            <input type="text" id="projTitle" class="form-control" required placeholder="e.g. RCC Post Office — Planning & Drafting">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Category Tag</label>
+            <input type="text" id="projTag" class="form-control" placeholder="e.g. AUTOCAD · STRUCTURAL">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Filter Categories <span>(comma-separated)</span></label>
+            <input type="text" id="projCategories" class="form-control" placeholder="autocad, structural, revit, sketchup">
+          </div>
+          <div class="form-group full-width">
+            <label class="form-label">Project Description</label>
+            <textarea id="projDesc" class="form-control" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Project Type</label>
+            <input type="text" id="projType" class="form-control" placeholder="e.g. RCC Building Design">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Software Used</label>
+            <input type="text" id="projSoftware" class="form-control" placeholder="AutoCAD">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Skills Highlighted</label>
+            <input type="text" id="projSkills" class="form-control" placeholder="2D Drafting · Building Planning">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Scale / Notes</label>
+            <input type="text" id="projScale" class="form-control" placeholder="Scale 1:100 · RCC framed structure">
+          </div>
+
+          <!-- Main Image -->
+          <div class="form-group full-width">
+            <label class="form-label">Main Project Image (URL or Upload)</label>
+            <div class="input-group">
+              <input type="text" id="projImage" class="form-control" placeholder="assets/highres/post-office-1.png">
+              <button type="button" class="btn btn-sm btn-cyan" onclick="document.getElementById('projImgUploader').click()">
+                Upload Image
+              </button>
+              <input type="file" id="projImgUploader" accept="image/*" style="display: none;" onchange="handleProjectImageUpload(this)">
+            </div>
+            <div class="image-preview-slot" id="projImgPreviewSlot" style="margin-top: 10px;">
+              <img id="projImgPreview" src="" alt="Project Preview">
+            </div>
+          </div>
+
+          <!-- Gallery Images -->
+          <div class="form-group full-width">
+            <label class="form-label">Gallery Images <span>(One URL per line)</span></label>
+            <textarea id="projGallery" class="form-control" rows="3" placeholder="assets/highres/post-office-1.png"></textarea>
+          </div>
+
+          <!-- Documents / PDFs -->
+          <div class="form-group full-width">
+            <label class="form-label">Document / PDF Attachments <span>(One URL per line)</span></label>
+            <div class="input-group">
+              <textarea id="projDocuments" class="form-control" rows="2" placeholder="assets/documents/RCC-Post-Office.pdf"></textarea>
+              <button type="button" class="btn btn-sm btn-cyan" onclick="document.getElementById('projDocUploader').click()">
+                Upload PDF
+              </button>
+              <input type="file" id="projDocUploader" accept=".pdf" style="display: none;" onchange="handleProjectDocUpload(this)">
+            </div>
+          </div>
+
+          <!-- Options -->
+          <div class="form-group">
+            <label class="form-label" style="display: flex; gap: 8px; cursor: pointer;">
+              <input type="checkbox" id="projFeatured" style="width: 18px; height: 18px;">
+              Featured Project
+            </label>
+          </div>
+          <div class="form-group">
+            <label class="form-label" style="display: flex; gap: 8px; cursor: pointer;">
+              <input type="checkbox" id="projVisible" checked style="width: 18px; height: 18px;">
+              Visible on Public Site
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('projectModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveProjectItem()">Save Project</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Admin JS Engine -->
+  <script src="admin.js"></script>
 </body>
 </html>

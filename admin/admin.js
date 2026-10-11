@@ -5,6 +5,9 @@ let currentData = null;
 let hasUnsavedChanges = false;
 
 document.addEventListener('DOMContentLoaded', async () => {
+  // 0. Ensure database config is loaded
+  await SupabaseService.loadConfig();
+
   // 1. Authenticate user
   const user = await SupabaseService.getUser();
   if (!user) {

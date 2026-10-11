@@ -7,9 +7,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="admin.css">
+  <link rel="stylesheet" href="/admin/admin.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase-client.js"></script>
+  <script src="/admin/supabase-client.js"></script>
   <style>
     .login-wrapper {
       min-height: 100vh;
@@ -23,7 +23,7 @@
       border: 1px solid var(--line);
       border-radius: var(--radius-lg);
       padding: 40px;
-      width: min(440px, 100%);
+      width: min(460px, 100%);
       box-shadow: 0 25px 70px rgba(0, 0, 0, 0.6), 0 0 40px rgba(67, 199, 238, 0.08);
       position: relative;
     }
@@ -35,7 +35,7 @@
     }
     .login-header {
       text-align: center;
-      margin-bottom: 28px;
+      margin-bottom: 24px;
     }
     .login-brand {
       font-family: var(--font-heading);
@@ -48,6 +48,27 @@
       font-size: 13px;
       color: var(--text-muted);
       margin-top: 6px;
+    }
+    .connection-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    .connection-badge.connected {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #34d399;
+    }
+    .connection-badge.disconnected {
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: #fbbf24;
     }
     .alert-box {
       padding: 12px 14px;
@@ -102,6 +123,11 @@
         <p class="login-subtitle">Secure Civil Engineering Portfolio Dashboard</p>
       </div>
 
+      <!-- Connection Status Indicator -->
+      <div id="connBadge" class="connection-badge disconnected">
+        <span>Checking database connection...</span>
+      </div>
+
       <div id="loginAlert" class="alert-box"></div>
 
       <form id="loginForm">
@@ -125,8 +151,8 @@
           ⚙ Database Connection Settings
         </button>
         <div class="config-body" id="configBody">
-          <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px;">
-            If environment variables are not yet set in Vercel, paste your Supabase credentials here to connect immediately:
+          <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.5;">
+            Paste your Supabase credentials here if environment variables are not yet configured in Vercel:
           </p>
           <div class="form-group">
             <label class="form-label" for="cfgUrl">Supabase Project URL</label>
@@ -136,8 +162,8 @@
             <label class="form-label" for="cfgAnonKey">Supabase Anon Key</label>
             <input type="text" id="cfgAnonKey" class="form-control" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6...">
           </div>
-          <button type="button" id="saveCfgBtn" class="btn btn-sm btn-cyan" style="width: 100%;">
-            Save Database Settings
+          <button type="button" id="saveCfgBtn" class="btn btn-sm btn-cyan" style="width: 100%; margin-top: 6px;">
+            Save & Connect Database
           </button>
         </div>
       </div>
@@ -152,28 +178,43 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
-      const cfg = SupabaseService.getConfig();
       const cfgUrlInput = document.getElementById('cfgUrl');
       const cfgKeyInput = document.getElementById('cfgAnonKey');
-      if (cfg.url) cfgUrlInput.value = cfg.url;
-      if (cfg.anonKey) cfgKeyInput.value = cfg.anonKey;
-
-      // Check if user is already logged in
-      const user = await SupabaseService.getUser();
-      if (user) {
-        window.location.href = '/admin';
-        return;
-      }
-
-      // Drawer toggle
+      const connBadge = document.getElementById('connBadge');
       const toggleBtn = document.getElementById('toggleConfigBtn');
       const configBody = document.getElementById('configBody');
+
+      // 1. Asynchronously load Supabase config
+      const cfg = await SupabaseService.loadConfig();
+
+      if (cfg.url && cfg.anonKey) {
+        cfgUrlInput.value = cfg.url;
+        cfgKeyInput.value = cfg.anonKey;
+        connBadge.className = 'connection-badge connected';
+        connBadge.innerHTML = '<span>🟢 Connected to Supabase</span>';
+      } else {
+        connBadge.className = 'connection-badge disconnected';
+        connBadge.innerHTML = '<span>⚠️ Database Not Connected Yet</span>';
+        configBody.classList.add('show');
+        showAlert('Please paste your Supabase Project URL & Anon Key below, or configure them in your Vercel Dashboard.', 'info');
+      }
+
+      // 2. Check if user is already logged in
+      try {
+        const user = await SupabaseService.getUser();
+        if (user) {
+          window.location.href = '/admin';
+          return;
+        }
+      } catch (e) {}
+
+      // Drawer toggle
       toggleBtn.addEventListener('click', () => {
         configBody.classList.toggle('show');
       });
 
       // Save Config button
-      document.getElementById('saveCfgBtn').addEventListener('click', () => {
+      document.getElementById('saveCfgBtn').addEventListener('click', async () => {
         const url = cfgUrlInput.value.trim();
         const key = cfgKeyInput.value.trim();
         if (!url || !key) {
@@ -181,6 +222,8 @@
           return;
         }
         SupabaseService.saveConfig(url, key);
+        connBadge.className = 'connection-badge connected';
+        connBadge.innerHTML = '<span>🟢 Connected to Supabase</span>';
         showAlert('Database settings saved! You can now log in.', 'info');
         configBody.classList.remove('show');
       });
@@ -203,7 +246,13 @@
           loginBtn.textContent = 'Success! Redirecting...';
           window.location.href = '/admin';
         } catch (err) {
-          showAlert(err.message || 'Login failed. Please check your credentials.', 'error');
+          let msg = err.message || 'Login failed. Please check your credentials.';
+          if (msg.includes('credentials') || msg.includes('Invalid login')) {
+            msg = 'Invalid email or password. Please verify your credentials in Supabase Dashboard > Authentication > Users.';
+          } else if (msg.includes('not configured')) {
+            configBody.classList.add('show');
+          }
+          showAlert(msg, 'error');
           loginBtn.disabled = false;
           loginBtn.textContent = 'Sign In to Dashboard';
         }

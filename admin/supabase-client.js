@@ -5,29 +5,66 @@
   const STORAGE_KEY_CONFIG = 'pm_portfolio_supabase_cfg';
   const STORAGE_KEY_AUTH = 'pm_portfolio_supabase_token';
 
-  // Default configuration or local overrides
-  function getConfig() {
+  let cachedConfig = null;
+  let supabaseInstance = null;
+
+  // Asynchronously load configuration from localStorage or /api/config
+  async function loadConfig() {
+    if (cachedConfig && cachedConfig.url && cachedConfig.anonKey) {
+      return cachedConfig;
+    }
+
+    // 1. Try localStorage first
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY_CONFIG);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.url && parsed.anonKey) {
+          cachedConfig = parsed;
+          return cachedConfig;
+        }
+      }
+    } catch (e) {}
+
+    // 2. Fetch from Vercel Serverless /api/config endpoint (which reads process.env)
+    try {
+      const res = await fetch('/api/config');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.configured && data.supabaseUrl && data.supabaseAnonKey) {
+          cachedConfig = { url: data.supabaseUrl, anonKey: data.supabaseAnonKey };
+          return cachedConfig;
+        }
+      }
+    } catch (e) {}
+
+    // 3. Fallback to window globals if any
+    cachedConfig = {
+      url: window.__ENV_SUPABASE_URL || '',
+      anonKey: window.__ENV_SUPABASE_ANON_KEY || ''
+    };
+    return cachedConfig;
+  }
+
+  function getConfigSync() {
+    if (cachedConfig) return cachedConfig;
     try {
       const saved = localStorage.getItem(STORAGE_KEY_CONFIG);
       if (saved) return JSON.parse(saved);
     } catch (e) {}
-
-    return {
-      url: window.__ENV_SUPABASE_URL || '',
-      anonKey: window.__ENV_SUPABASE_ANON_KEY || ''
-    };
+    return { url: '', anonKey: '' };
   }
 
   function saveConfig(url, anonKey) {
     const cfg = { url: url.trim().replace(/\/$/, ''), anonKey: anonKey.trim() };
+    cachedConfig = cfg;
     localStorage.setItem(STORAGE_KEY_CONFIG, JSON.stringify(cfg));
+    supabaseInstance = null; // force re-creation
     return cfg;
   }
 
-  // Initialize Supabase SDK instance if available
-  let supabaseInstance = null;
-  function getClient() {
-    const cfg = getConfig();
+  async function getClient() {
+    const cfg = await loadConfig();
     if (!cfg.url || !cfg.anonKey) return null;
     if (window.supabase && (!supabaseInstance || supabaseInstance._url !== cfg.url)) {
       try {
@@ -46,15 +83,16 @@
   }
 
   const SupabaseService = {
-    getConfig,
+    loadConfig,
+    getConfig: getConfigSync,
     saveConfig,
     getClient,
 
     // Authentication
     async login(email, password) {
-      const client = getClient();
+      const client = await getClient();
       if (!client) {
-        throw new Error('Supabase URL and Anon Key are not configured yet. Please configure credentials.');
+        throw new Error('Supabase URL and Anon Key are not configured yet. Please enter credentials in Database Connection Settings or set them in Vercel.');
       }
       const { data, error } = await client.auth.signInWithPassword({ email, password });
       if (error) throw error;
@@ -65,7 +103,7 @@
     },
 
     async logout() {
-      const client = getClient();
+      const client = await getClient();
       if (client) {
         try { await client.auth.signOut(); } catch (e) {}
       }
@@ -75,7 +113,7 @@
     },
 
     async getUser() {
-      const client = getClient();
+      const client = await getClient();
       if (!client) return null;
       try {
         const { data: { user }, error } = await client.auth.getUser();
@@ -87,7 +125,7 @@
     },
 
     async getSessionToken() {
-      const client = getClient();
+      const client = await getClient();
       if (client) {
         const { data: { session } } = await client.auth.getSession();
         if (session?.access_token) return session.access_token;
@@ -101,7 +139,7 @@
       // Try serverless API first
       try {
         const res = await fetch('/api/admin/content', {
-          headers: { 'Authorization': `Bearer ${token}` }
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
         });
         if (res.ok) {
           const json = await res.json();
@@ -110,7 +148,7 @@
       } catch (apiErr) {}
 
       // Direct Supabase query as fallback
-      const client = getClient();
+      const client = await getClient();
       if (client) {
         const { data, error } = await client
           .from('portfolio_content')
@@ -144,7 +182,7 @@
       } catch (e) {}
 
       // Direct client fallback
-      const client = getClient();
+      const client = await getClient();
       if (!client) throw new Error('Database client not connected.');
       const user = await this.getUser();
       const { data, error } = await client
@@ -175,7 +213,7 @@
       } catch (e) {}
 
       // Direct client fallback
-      const client = getClient();
+      const client = await getClient();
       if (!client) throw new Error('Database client not connected.');
       const user = await this.getUser();
       const now = new Date().toISOString();
@@ -206,7 +244,7 @@
         if (res.ok) return await res.json();
       } catch (e) {}
 
-      const client = getClient();
+      const client = await getClient();
       if (!client) throw new Error('Database client not connected.');
       const { data: pubData, error: pubErr } = await client
         .from('portfolio_content')
@@ -252,7 +290,7 @@
       } catch (apiErr) {}
 
       // Direct Supabase storage fallback
-      const client = getClient();
+      const client = await getClient();
       if (!client) throw new Error('Database storage is not connected.');
 
       const cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');

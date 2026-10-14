@@ -68,7 +68,7 @@ nav{background:rgba(6,15,22,.72);box-shadow:0 8px 30px rgba(0,0,0,.16)}
 .building{filter:drop-shadow(0 0 18px rgba(67,199,238,.35));animation:buildingPulse 3s ease-in-out infinite}
 @keyframes buildingPulse{50%{transform:scale(1.06);filter:drop-shadow(0 0 30px rgba(67,199,238,.58))}}
 .skill,.project,.panel,.stat{transition:transform .35s ease,box-shadow .35s ease,border-color .35s ease}
-.skill:hover,.project:hover,.panel:hover{transform:translateY(-7px);border-color:rgba(67,199,238,.5);box-shadow:0 18px 45px rgba(0,0,0,.25)}.skill-clickable{cursor:pointer;position:relative;overflow:hidden}.skill-clickable:after{content:"";position:absolute;inset:-2px;background:linear-gradient(115deg,transparent 20%,rgba(67,199,238,.16) 45%,transparent 70%);transform:translateX(-120%);transition:transform .7s ease;pointer-events:none}.skill-clickable:hover:after,.skill-clickable:focus-visible:after{transform:translateX(120%)}.skill-clickable:focus-visible{outline:2px solid var(--accent);outline-offset:3px}.click-hint{float:right;font-size:10px;color:var(--accent);font-weight:700;opacity:.72}.skill-clickable:hover .click-hint{opacity:1}.focus-project{box-shadow:0 0 0 2px var(--accent),0 20px 55px rgba(67,199,238,.22)!important}
+.skill:hover,.project:hover,.panel:hover{transform:translateY(-7px);border-color:rgba(67,199,238,.5);box-shadow:0 18px 45px rgba(0,0,0,.25)}.skill-clickable{cursor:pointer;position:relative;overflow:hidden}.skill-clickable:after{content:"";position:absolute;inset:-2px;background:linear-gradient(115deg,transparent 20%,rgba(67,199,238,.16) 45%,transparent 70%);transform:translateX(-120%);transition:transform .7s ease;pointer-events:none}.skill-clickable:hover:after,.skill-clickable:focus-visible:after{transform:translateX(120%)}.skill-clickable:focus-visible{outline:2px solid var(--accent);outline-offset:3px}.click-hint{float:right;font-size:10px;color:var(--accent);font-weight:700;opacity:.72}.skill-clickable:hover .click-hint{opacity:1}.focus-project{box-shadow:0 0 0 3px var(--accent),0 25px 65px rgba(67,199,238,.45)!important;transform:translateY(-8px)!important;border-color:var(--accent)!important;transition:transform .35s ease,box-shadow .35s ease,border-color .35s ease!important}.software-modal-box{max-width:520px;margin:auto}
 .project:hover{box-shadow:0 22px 55px rgba(0,0,0,.32)}
 .project img{transition:transform .55s ease,filter .55s ease}.project:hover img{transform:scale(1.025);filter:saturate(1.08)}
 .btn{transition:transform .25s ease,box-shadow .25s ease}.btn:hover{transform:translateY(-3px);box-shadow:0 10px 25px rgba(0,0,0,.24)}
@@ -316,6 +316,194 @@ section:nth-of-type(even){background:rgba(13,13,20,.44)!important}
 <section id="contact"><div class="container"><div class="section-head"><div class="eyebrow" id="contactEyebrow"></div><h2 id="contactHeading"></h2><p id="contactDescription"></p></div><div class="contact"><a id="contactEmail" href="mailto:pawanmate41@gmail.com"><span>Email</span>pawanmate41@gmail.com</a><a id="contactLinkedin" href="https://www.linkedin.com/in/pawan-mate-6a989b379" target="_blank"><span>LinkedIn</span>linkedin.com/in/pawan-mate-6a989b379 ↗</a></div></div></section>
 <footer>© 2026 Pawan Sanjay Mate · Civil Engineering · BIM · Structural Design</footer>
 <script>
+// --- Global Utilities: Slider, Filters & Software Work ---
+let heroSliderTimer = null;
+let heroSliderIndex = 0;
+
+function initHeroSlider() {
+  const slider = document.getElementById('heroSlider');
+  if (!slider) return;
+
+  if (heroSliderTimer) {
+    clearInterval(heroSliderTimer);
+    heroSliderTimer = null;
+  }
+
+  const slides = Array.from(slider.querySelectorAll('.slide'));
+  if (!slides.length) return;
+
+  const dotsContainer = slider.querySelector('.slider-dots');
+  const prevBtn = slider.querySelector('.slider-prev');
+  const nextBtn = slider.querySelector('.slider-next');
+
+  if (dotsContainer) {
+    dotsContainer.innerHTML = '';
+    slides.forEach((_, i) => {
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.setAttribute('aria-label', 'Show project ' + (i + 1));
+      dot.addEventListener('click', (e) => {
+        e.stopPropagation();
+        goToSlide(i);
+      });
+      dotsContainer.appendChild(dot);
+    });
+  }
+
+  const dots = dotsContainer ? Array.from(dotsContainer.children) : [];
+
+  function goToSlide(i) {
+    heroSliderIndex = (i + slides.length) % slides.length;
+    slides.forEach((s, n) => s.classList.toggle('active', n === heroSliderIndex));
+    dots.forEach((d, n) => d.classList.toggle('active', n === heroSliderIndex));
+    restartTimer();
+  }
+
+  function restartTimer() {
+    if (heroSliderTimer) clearInterval(heroSliderTimer);
+    heroSliderTimer = setInterval(() => {
+      goToSlide(heroSliderIndex + 1);
+    }, 4500);
+  }
+
+  if (prevBtn) {
+    prevBtn.onclick = (e) => {
+      e.stopPropagation();
+      goToSlide(heroSliderIndex - 1);
+    };
+  }
+  if (nextBtn) {
+    nextBtn.onclick = (e) => {
+      e.stopPropagation();
+      goToSlide(heroSliderIndex + 1);
+    };
+  }
+
+  slider.onmouseenter = () => {
+    if (heroSliderTimer) clearInterval(heroSliderTimer);
+  };
+  slider.onmouseleave = restartTimer;
+
+  slides.forEach(slide => {
+    slide.onclick = () => {
+      const pi = slide.dataset.project;
+      if (pi !== undefined && typeof openProject === 'function') {
+        openProject(Number(pi));
+      }
+    };
+  });
+
+  goToSlide(0);
+}
+window.initHeroSlider = initHeroSlider;
+
+function applyFilter(filterKey, scrollIntoView) {
+  const filterBtns = document.querySelectorAll('.filter');
+  filterBtns.forEach(b => b.classList.toggle('active', b.dataset.filter === filterKey));
+
+  const cards = Array.from(document.querySelectorAll('.project'));
+  let firstMatch = null;
+  cards.forEach(card => {
+    const cats = (card.dataset.cat || '').toLowerCase();
+    const match = filterKey === 'all' || cats.split(/\s+/).includes(filterKey.toLowerCase()) || cats.includes(filterKey.toLowerCase());
+    card.style.display = match ? 'block' : 'none';
+    card.classList.remove('focus-project');
+    if (match && !firstMatch) firstMatch = card;
+  });
+
+  if (scrollIntoView) {
+    const projectsSec = document.getElementById('projects');
+    if (projectsSec) {
+      projectsSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    if (firstMatch) {
+      setTimeout(() => {
+        firstMatch.classList.add('focus-project');
+        setTimeout(() => firstMatch.classList.remove('focus-project'), 3000);
+      }, 500);
+    }
+  }
+}
+window.applyFilter = applyFilter;
+
+function initFilters() {
+  document.querySelectorAll('.filter').forEach(btn => {
+    btn.onclick = () => {
+      applyFilter(btn.dataset.filter, false);
+    };
+  });
+}
+window.initFilters = initFilters;
+
+const softwareMap = {
+  revit: {
+    title: 'Revit Work',
+    desc: 'Explore my published Revit projects and BIM architectural modelling sheets.',
+    filter: 'revit'
+  },
+  autocad: {
+    title: 'AutoCAD Work',
+    desc: 'Explore my AutoCAD planning, drafting and structural drawing work.',
+    filter: 'autocad'
+  },
+  bim: {
+    title: 'BIM Work',
+    desc: 'Explore my BIM-focused Revit models and architectural documentation.',
+    filter: 'revit'
+  },
+  sketchup: {
+    title: 'SketchUp Work',
+    desc: 'Explore my SketchUp residential 3D visualization work including interior and landscape views.',
+    filter: 'sketchup'
+  },
+  structural: {
+    title: 'Structural Drafting & Design',
+    desc: 'Explore my structural drafting, column/beam layouts, and RCC detailing.',
+    filter: 'structural'
+  },
+  staad: {
+    title: 'STAAD.Pro Work',
+    desc: 'No STAAD.Pro project has been published yet. This section will be updated when a completed structural analysis project is added.',
+    filter: null
+  },
+  etabs: {
+    title: 'ETABS Work',
+    desc: 'No ETABS project has been published yet. This section will be updated when a completed structural analysis project is added.',
+    filter: null
+  }
+};
+
+function openSoftwareWork(key) {
+  const cfg = softwareMap[key];
+  if (!cfg) return;
+
+  if (cfg.filter) {
+    applyFilter(cfg.filter, true);
+  } else {
+    const softwareModal = document.getElementById('softwareModal');
+    const softwareModalTitle = document.getElementById('softwareModalTitle');
+    const softwareModalDesc = document.getElementById('softwareModalDesc');
+    if (softwareModal && softwareModalTitle && softwareModalDesc) {
+      softwareModalTitle.textContent = cfg.title;
+      softwareModalDesc.textContent = cfg.desc;
+      softwareModal.classList.add('show');
+      softwareModal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+  }
+}
+window.openSoftwareWork = openSoftwareWork;
+
+function closeSoftware() {
+  const softwareModal = document.getElementById('softwareModal');
+  if (softwareModal) {
+    softwareModal.classList.remove('show');
+    softwareModal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+}
+window.closeSoftware = closeSoftware;
+
 window.renderCMSContent = function(customData) {
   const d = customData || window.PORTFOLIO_DATA;
   if (!d) return;
@@ -411,9 +599,9 @@ window.renderCMSContent = function(customData) {
     `).join('');
     // Re-bind skill click listeners
     document.querySelectorAll('.skill-clickable').forEach(card => {
-      card.addEventListener('click', () => typeof openSoftwareWork === 'function' && openSoftwareWork(card.dataset.software));
+      card.addEventListener('click', () => openSoftwareWork(card.dataset.software));
       card.addEventListener('keydown', e => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); typeof openSoftwareWork === 'function' && openSoftwareWork(card.dataset.software); }
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openSoftwareWork(card.dataset.software); }
       });
     });
   }
@@ -447,16 +635,16 @@ window.renderCMSContent = function(customData) {
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); typeof openProject === 'function' && openProject(Number(card.dataset.project)); }
       });
     });
+
+    initFilters();
   }
 
   // Hero Slider
   const slidesList = (d.hero && d.hero.slider) || d.hero_slides || (Array.isArray(d.hero) ? d.hero : []);
   const slider = document.getElementById('heroSlider');
   if (slider && slidesList.length) {
-    const dots = slider.querySelector('.slider-dots');
     const prev = slider.querySelector('.slider-prev');
     slider.querySelectorAll('.slide').forEach(s => s.remove());
-    if (dots) dots.innerHTML = '';
 
     slidesList.forEach((x, i) => {
       const slide = document.createElement('div');
@@ -464,13 +652,9 @@ window.renderCMSContent = function(customData) {
       slide.dataset.project = x.project_index !== undefined ? x.project_index : (x.project !== undefined ? x.project : 0);
       slide.innerHTML = `<img src="${x.image}" alt="${x.alt || ''}"><span>${x.label || ''}</span>`;
       slider.insertBefore(slide, prev);
-      if (dots) {
-        const dot = document.createElement('button');
-        dot.type = 'button';
-        dot.setAttribute('aria-label', 'Show project ' + (i + 1));
-        dots.appendChild(dot);
-      }
     });
+
+    initHeroSlider();
   }
 
   // Appearance & Theme Colors
@@ -553,14 +737,7 @@ window.renderCMSContent();
 })();
 </script>
 <script>
-const buttons = [...document.querySelectorAll('.filter')];
-buttons.forEach(btn => btn.onclick = () => {
-  buttons.forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  const f = btn.dataset.filter;
-  const cards = [...document.querySelectorAll('.project')];
-  cards.forEach(c => c.style.display = f === 'all' || (c.dataset.cat && c.dataset.cat.includes(f)) ? 'block' : 'none');
-});
+initFilters();
 </script>
 <div class="modal" id="softwareModal" aria-hidden="true"><div class="modal-box software-modal-box"><button class="modal-close" id="softwareModalClose" aria-label="Close">×</button><div class="modal-content"><div class="eyebrow">Software portfolio</div><h2 id="softwareModalTitle"></h2><p id="softwareModalDesc"></p><button class="btn" id="softwareModalClose2">Close</button></div></div></div>
 <div class="modal" id="projectModal" aria-hidden="true">
@@ -670,48 +847,25 @@ workViewerImage.addEventListener('wheel',e=>{e.preventDefault();viewerZoom=Math.
 workViewerImage.addEventListener('mousedown',e=>{if(viewerZoom<=1)return;dragging=true;workViewerImage.classList.add('dragging');dragStartX=e.clientX;dragStartY=e.clientY;panStartX=viewerPanX;panStartY=viewerPanY});
 window.addEventListener('mousemove',e=>{if(!dragging)return;viewerPanX=panStartX+(e.clientX-dragStartX);viewerPanY=panStartY+(e.clientY-dragStartY);applyViewerTransform()});
 window.addEventListener('mouseup',()=>{dragging=false;workViewerImage.classList.remove('dragging')});
-const softwareMap={revit:{title:'Revit Work',desc:'Explore my published Revit projects and BIM modelling sheets.',filter:'revit'},autocad:{title:'AutoCAD Work',desc:'Explore my AutoCAD planning, drafting and structural drawing work.',filter:'autocad'},bim:{title:'BIM Work',desc:'Explore my BIM-focused Revit models and architectural documentation.',filter:'revit'},sketchup:{title:'SketchUp Work',desc:'Explore my SketchUp residential 3D visualization work including interior and landscape views.',filter:'sketchup'},staad:{title:'STAAD.Pro Work',desc:'No STAAD.Pro project has been published yet. This section will be updated when a completed structural analysis project is added.',filter:null},etabs:{title:'ETABS Work',desc:'No ETABS project has been published yet. This section will be updated when a completed structural analysis project is added.',filter:null}};
-const softwareModal=document.getElementById('softwareModal'), softwareModalTitle=document.getElementById('softwareModalTitle'), softwareModalDesc=document.getElementById('softwareModalDesc');
-function openSoftwareWork(key){const cfg=softwareMap[key];if(!cfg)return;if(cfg.filter){buttons.forEach(b=>b.classList.toggle('active',b.dataset.filter===cfg.filter));cards.forEach(c=>{c.style.display=c.dataset.cat.includes(cfg.filter)?'block':'none';c.classList.remove('focus-project')});document.querySelector('#projects').scrollIntoView({behavior:'smooth',block:'start'});setTimeout(()=>{const first=cards.find(c=>c.style.display==='block');if(first)first.classList.add('focus-project')},500)}else{softwareModalTitle.textContent=cfg.title;softwareModalDesc.textContent=cfg.desc;softwareModal.classList.add('show');softwareModal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden'}}
-document.querySelectorAll('.skill-clickable').forEach(card=>{card.addEventListener('click',()=>openSoftwareWork(card.dataset.software));card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openSoftwareWork(card.dataset.software)}})});
-function closeSoftware(){softwareModal.classList.remove('show');softwareModal.setAttribute('aria-hidden','true');document.body.style.overflow=''}
-document.getElementById('softwareModalClose').addEventListener('click',closeSoftware);document.getElementById('softwareModalClose2').addEventListener('click',closeSoftware);softwareModal.addEventListener('click',e=>{if(e.target===softwareModal)closeSoftware});
+const softwareModalClose = document.getElementById('softwareModalClose');
+const softwareModalClose2 = document.getElementById('softwareModalClose2');
+const softwareModal = document.getElementById('softwareModal');
+if (softwareModalClose) softwareModalClose.addEventListener('click', closeSoftware);
+if (softwareModalClose2) softwareModalClose2.addEventListener('click', closeSoftware);
+if (softwareModal) softwareModal.addEventListener('click', e => { if (e.target === softwareModal) closeSoftware(); });
+
 // Scroll reveal animation — lightweight and mobile friendly
-const revealItems=document.querySelectorAll('section,.skill,.project,.panel');
-revealItems.forEach((el,i)=>{if(!el.classList.contains('hero')) el.classList.add('reveal');});
-const revealObserver=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('visible');revealObserver.unobserve(entry.target);}})},{threshold:.12});
-revealItems.forEach(el=>revealObserver.observe(el));
-</script>
-
-
-<script>
-(function(){
-  const slider=document.querySelector('.blueprint-slider');
-  if(!slider) return;
-  const slides=[...slider.querySelectorAll('.slide')];
-  const dots=slider.querySelector('.slider-dots');
-  const prev=slider.querySelector('.slider-prev');
-  const next=slider.querySelector('.slider-next');
-  let index=0, timer;
-  slides.forEach((_,i)=>{
-    const d=document.createElement('button'); d.type='button'; d.setAttribute('aria-label','Show project '+(i+1));
-    d.addEventListener('click',()=>go(i)); dots.appendChild(d);
+const revealItems = document.querySelectorAll('section,.skill,.project,.panel');
+revealItems.forEach(el => { if (!el.classList.contains('hero')) el.classList.add('reveal'); });
+const revealObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      revealObserver.unobserve(entry.target);
+    }
   });
-  const dotEls=[...dots.children];
-  function go(i){
-    index=(i+slides.length)%slides.length;
-    slides.forEach((s,n)=>s.classList.toggle('active',n===index));
-    dotEls.forEach((d,n)=>d.classList.toggle('active',n===index));
-    restart();
-  }
-  function restart(){clearInterval(timer); timer=setInterval(()=>go(index+1),4500)}
-  prev.addEventListener('click',()=>go(index-1));
-  next.addEventListener('click',()=>go(index+1));
-  slider.addEventListener('mouseenter',()=>clearInterval(timer));
-  slider.addEventListener('mouseleave',restart);
-  go(0);
-  slides.forEach(slide=>slide.addEventListener('click',()=>{const pi=slide.dataset.project;if(pi!==undefined)openProject(Number(pi));}));
-})();
+}, { threshold: .12 });
+revealItems.forEach(el => revealObserver.observe(el));
 </script>
 
 <script>

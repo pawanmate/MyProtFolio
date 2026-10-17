@@ -45,6 +45,8 @@ window.PORTFOLIO_DATA = {
       "eyebrow": "05 — Contact",
       "heading": "Let's build something meaningful.",
       "description": "Open to learning, collaboration and Civil Engineering opportunities.",
+      "phone": "+91 8669345161",
+      "phone_url": "tel:+918669345161",
       "email": "pawanmate41@gmail.com",
       "linkedin": "linkedin.com/in/pawan-mate-6a989b379",
       "linkedin_url": "https://www.linkedin.com/in/pawan-mate-6a989b379"

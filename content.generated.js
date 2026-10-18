@@ -15,6 +15,7 @@ window.PORTFOLIO_DATA = {
       "eyebrow": "01 — About",
       "heading": "Engineering with a design mindset.",
       "description": "I am developing practical skills in BIM, CAD, architectural modelling and structural drafting, with a focus on turning engineering concepts into clear digital drawings and coordinated models.",
+      "image": "assets/pawan-mate.jpg",
       "purpose_heading": "Engineering with purpose",
       "purpose_text": "I explore the intersection of civil engineering and digital design through BIM, CAD, structural drafting and 3D modelling. My goal is to create clear, accurate and practical project documentation.",
       "education_heading": "Education",

@@ -7,6 +7,7 @@ window.PORTFOLIO_DATA = {
       "name_first": "Pawan Sanjay",
       "name_last": "Mate",
       "intro": "Civil Engineering student focused on BIM, technical drafting, architectural modelling and structural design. I turn engineering concepts into detailed drawings, digital models and practical project documentation.",
+      "photo": "assets/pawan-mate.jpg",
       "cv_label": "View CV",
       "linkedin_label": "LinkedIn",
       "linkedin_url": "https://www.linkedin.com/in/pawan-mate-6a989b379"

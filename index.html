@@ -203,9 +203,15 @@ section.reveal.visible .section-head .eyebrow{opacity:1;transform:none}
 .navin{width:min(var(--max),88%);margin:auto}
 nav{background:rgba(4,12,17,.78)}
 .hero .eyebrow{margin-top:4px}
-.hero-photo-wrap{width:225px;height:225px;border-radius:50%;padding:4px;background:linear-gradient(135deg,var(--accent),rgba(255,154,74,.3));box-shadow:0 0 30px rgba(255,154,74,.35),0 12px 35px rgba(0,0,0,.6);margin-bottom:22px;display:inline-block;transition:transform .35s ease,box-shadow .35s ease;animation:heroIn 1s ease both}
-.hero-photo-wrap:hover{transform:scale(1.03);box-shadow:0 0 40px rgba(255,154,74,.5),0 18px 45px rgba(0,0,0,.7)}
-.hero-photo{width:100%;height:100%;border-radius:50%;object-fit:cover;object-position:center 15%;display:block;border:2px solid rgba(11,16,32,.9)}
+.hero-photo-wrap{position:relative;width:225px;height:225px;border-radius:50%;padding:3px;border:1.5px solid rgba(255,154,74,.8);background:rgba(11,16,32,.5);box-shadow:0 10px 28px rgba(0,0,0,.55);margin-bottom:22px;display:inline-block;box-sizing:border-box;transition:transform .3s ease,box-shadow .3s ease,border-color .3s ease}
+.hero-photo-wrap::before{content:"";position:absolute;inset:-3px;border-radius:50%;pointer-events:none;box-shadow:0 0 20px rgba(255,154,74,.32),0 0 38px rgba(255,154,74,.14);animation:photoGlowPulse 4s ease-in-out infinite alternate;transition:opacity .3s ease,box-shadow .3s ease}
+.hero-photo-wrap:hover{transform:scale(1.03);border-color:var(--accent);box-shadow:0 14px 34px rgba(0,0,0,.7)}
+.hero-photo-wrap:hover::before{opacity:1;box-shadow:0 0 30px rgba(255,154,74,.52),0 0 52px rgba(255,154,74,.24)}
+.hero-photo{width:100%;height:100%;border-radius:50%;object-fit:cover;object-position:center 15%;display:block;border:1px solid rgba(11,16,32,.8)}
+.hero-photo-orbit{position:absolute;inset:-1.5px;border-radius:50%;pointer-events:none;animation:heroDotOrbit 11s linear infinite;z-index:2}
+.hero-orbit-dot{position:absolute;top:0;left:50%;width:6px;height:6px;margin-left:-3px;margin-top:-3px;background:#fff6e5;border:1px solid var(--accent);border-radius:50%;box-shadow:0 0 8px 1.5px rgba(255,154,74,.9)}
+@keyframes photoGlowPulse{0%{opacity:.40}100%{opacity:1}}
+@keyframes heroDotOrbit{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 @media(max-width:850px){.hero{padding:55px 0 70px;background-position:center}.hero > .container{width:min(var(--max),90%);grid-template-columns:1fr;gap:38px}.hero > .container > div:first-child{padding-left:0}.hero-card{margin-right:0}.hero-photo-wrap{width:190px;height:190px;margin-bottom:20px}}
 @media(max-width:560px){.hero{padding-top:42px}.hero > .container{width:90%}.hero h1{font-size:clamp(42px,14vw,62px)}.hero-photo-wrap{width:160px;height:160px;margin-bottom:16px}}
 
@@ -266,7 +272,7 @@ section.reveal.visible .section-head p{animation:titleRise .85s .1s cubic-bezier
 /* magnetic button feel */
 .btn{will-change:transform}
 @media(max-width:850px){body .cursor-glow{display:none}.infrastructure-depth{opacity:.07}.hero-card:after{animation:none}}
-@media(prefers-reduced-motion:reduce){.hero:before,.hero-card:after,.hero h1 span,.hero-card .stats .stat,.infrastructure-depth{animation:none!important}.cursor-glow,.scroll-progress{display:none!important}}
+@media(prefers-reduced-motion:reduce){.hero:before,.hero-card:after,.hero h1 span,.hero-card .stats .stat,.infrastructure-depth,.hero-photo-wrap::before,.hero-photo-orbit{animation:none!important}.cursor-glow,.scroll-progress,.hero-photo-orbit{display:none!important}}
 </style>
 
 <style id="civil-sunset-theme">
@@ -307,7 +313,7 @@ section:nth-of-type(even){background:rgba(13,13,20,.44)!important}
 <div class="scroll-atmosphere" aria-hidden="true"></div><div class="scroll-lines" aria-hidden="true"></div>
 <nav><div class="container navin"><a class="logo" href="#home">PAWAN<span>.</span></a><div class="links"><a href="#about">About</a><a href="#skills">Skills</a><a href="#projects">Projects</a><a href="#cv">CV</a><a href="#contact">Contact</a></div></div></nav>
 
-<section class="hero" id="home"><div class="container"><div><div class="hero-photo-wrap"><img src="assets/pawan-mate.jpg" alt="Pawan Sanjay Mate — Civil Engineering & BIM" class="hero-photo" id="heroPhoto" loading="eager"></div><div class="eyebrow" id="heroEyebrow"></div><h1><span id="heroNameFirst"></span><br><span id="heroNameLast"></span></h1><p id="heroIntro"></p><div class="buttons"><a class="btn primary" href="#projects">Explore My Work ↓</a><a class="btn" id="heroCvButton" href="Pawan-Mate-CV.pdf" target="_blank">View CV</a><a class="btn" id="heroLinkedinButton" href="https://www.linkedin.com/in/pawan-mate-6a989b379" target="_blank">LinkedIn ↗</a></div></div><div class="hero-card"><div class="blueprint blueprint-slider" id="heroSlider" aria-label="Featured project work"><button class="slider-prev" type="button" aria-label="Previous project">‹</button><button class="slider-next" type="button" aria-label="Next project">›</button><div class="slider-dots" aria-label="Project slides"></div></div><div class="stats"><div class="stat"><b>6+</b><small>Core tools</small></div><div class="stat"><b>BIM</b><small>Focus</small></div><div class="stat"><b>2028</b><small>BE target</small></div></div></div></div></section>
+<section class="hero" id="home"><div class="container"><div><div class="hero-photo-wrap"><img src="assets/pawan-mate.jpg" alt="Pawan Sanjay Mate — Civil Engineering & BIM" class="hero-photo" id="heroPhoto" loading="eager"><div class="hero-photo-orbit" aria-hidden="true"><div class="hero-orbit-dot"></div></div></div><div class="eyebrow" id="heroEyebrow"></div><h1><span id="heroNameFirst"></span><br><span id="heroNameLast"></span></h1><p id="heroIntro"></p><div class="buttons"><a class="btn primary" href="#projects">Explore My Work ↓</a><a class="btn" id="heroCvButton" href="Pawan-Mate-CV.pdf" target="_blank">View CV</a><a class="btn" id="heroLinkedinButton" href="https://www.linkedin.com/in/pawan-mate-6a989b379" target="_blank">LinkedIn ↗</a></div></div><div class="hero-card"><div class="blueprint blueprint-slider" id="heroSlider" aria-label="Featured project work"><button class="slider-prev" type="button" aria-label="Previous project">‹</button><button class="slider-next" type="button" aria-label="Next project">›</button><div class="slider-dots" aria-label="Project slides"></div></div><div class="stats"><div class="stat"><b>6+</b><small>Core tools</small></div><div class="stat"><b>BIM</b><small>Focus</small></div><div class="stat"><b>2028</b><small>BE target</small></div></div></div></div></section>
 
 <section id="about"><div class="container"><div class="section-head"><div class="eyebrow" id="aboutEyebrow"></div><h2 id="aboutHeading"></h2><p id="aboutDescription"></p></div><div class="about"><div class="panel"><h3 id="aboutPurposeHeading"></h3><p id="aboutPurposeText"></p></div><div class="panel"><h3 id="aboutEducationHeading"></h3><p id="aboutEducationText"></p><p><b>Academic performance:</b> <span id="aboutAcademic"></span></p></div></div></div></section>
 
